@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 export default function Room({ room }) {
-  console.log(room);
+  // console.log(room);
   const { name, slug, images, price } = room;
 
   return (

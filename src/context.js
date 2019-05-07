@@ -9,18 +9,44 @@ class RoomProvider extends Component {
     rooms: [],
     sortedRooms: [],
     featuredRooms: [],
-    loading: true
+    loading: true,
+    type: "all",
+    capacity: 1,
+    price: 0,
+    maxPrice: 0,
+    minPrice: 0,
+    maxSize: 0,
+    minSize: 0,
+    breakfast: false,
+    pets: false
   };
   //get data
   componentDidMount() {
     let rooms = this.formatData(items);
     let featuredRooms = rooms.filter(room => room.featured === true);
+    // console.log(...rooms);
+
+    let maxPrice = Math.max(
+      ...rooms.map(item => {
+        // console.log(item.price);
+        return item.price;
+      })
+    );
+    let maxSize = Math.max(
+      ...rooms.map(item => {
+        // console.log(item.price);
+        return item.size;
+      })
+    );
+    // console.log(maxPrice);
 
     this.setState({
       rooms,
       sortedRooms: rooms,
       featuredRooms,
-      loading: false
+      loading: false,
+      maxPrice,
+      maxSize
     });
   }
 
@@ -37,9 +63,30 @@ class RoomProvider extends Component {
     return tempItems;
   }
 
+  getRoom = slug => {
+    let tempRooms = [...this.state.rooms];
+    const room = tempRooms.find(room => room.slug === slug);
+    return room;
+  };
+
+  handleChange = event => {
+    const { type, name, value } = event.target;
+    console.log(type, name, value);
+  };
+
+  filterRooms = () => {
+    console.log("Hellowfilter");
+  };
+
   render() {
     return (
-      <RoomContext.Provider value={{ ...this.state }}>
+      <RoomContext.Provider
+        value={{
+          ...this.state,
+          getRoom: this.getRoom,
+          handleChange: this.handleChange
+        }}
+      >
         {this.props.children}
       </RoomContext.Provider>
     );
@@ -47,5 +94,15 @@ class RoomProvider extends Component {
 }
 
 const RoomConsumer = RoomContext.Consumer;
+
+export function withRoomConsumer(Component) {
+  return function ConsumerWrapper(props) {
+    return (
+      <RoomConsumer>
+        {value => <Component {...props} context={value} />}
+      </RoomConsumer>
+    );
+  };
+}
 
 export { RoomProvider, RoomConsumer, RoomContext };
