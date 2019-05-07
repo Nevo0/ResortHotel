@@ -17,6 +17,7 @@ class RoomProvider extends Component {
     minPrice: 0,
     maxSize: 0,
     minSize: 0,
+
     breakfast: false,
     pets: false
   };
@@ -46,7 +47,8 @@ class RoomProvider extends Component {
       featuredRooms,
       loading: false,
       maxPrice,
-      maxSize
+      maxSize,
+      price: maxPrice
     });
   }
 
@@ -70,12 +72,60 @@ class RoomProvider extends Component {
   };
 
   handleChange = event => {
-    const { type, name, value } = event.target;
-    console.log(type, name, value);
+    // console.log(event.type, event.target.type);
+
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    // console.log(value);
+
+    const name = event.target.name;
+
+    this.setState(
+      {
+        [name]: value
+      },
+      this.filterRooms
+    );
   };
 
   filterRooms = () => {
-    console.log("Hellowfilter");
+    // console.log("Hellowfilter");
+    let {
+      rooms,
+      type,
+      capacity,
+      price,
+      minPrice,
+      maxPrice,
+      minSize,
+      maxSize,
+      breakfast,
+      pets
+    } = this.state;
+    let tempRooms = [...rooms];
+    capacity = parseInt(capacity);
+    price = parseInt(price);
+    if (type !== "all") {
+      tempRooms = tempRooms.filter(room => room.type === type);
+    }
+    if (capacity !== 1) {
+      tempRooms = tempRooms.filter(room => room.capacity >= capacity);
+    }
+
+    tempRooms = tempRooms.filter(room => room.price <= price);
+
+    tempRooms = tempRooms.filter(room => room.size >= minSize);
+    tempRooms = tempRooms.filter(room => room.size <= maxSize);
+    if (breakfast) {
+      tempRooms = tempRooms.filter(room => room.breakfast === breakfast);
+    }
+    if (pets) {
+      tempRooms = tempRooms.filter(room => room.pets === pets);
+    }
+
+    this.setState({
+      sortedRooms: tempRooms
+    });
   };
 
   render() {
